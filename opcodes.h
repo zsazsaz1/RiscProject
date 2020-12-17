@@ -1,3 +1,4 @@
 #pragma once
+#define USED_IMMEDIATE 1
 
-int func();
+extern int (*OpcodeMap[22])();

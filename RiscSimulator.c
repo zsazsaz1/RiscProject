@@ -46,6 +46,9 @@ int main(int argc, char* argv[])
 	int b = readFileAsHex(argv[2], Ram, RAM_SIZE);
 
 	while (1) {
+		int32_t currentInstruction = InstructionRam[PC];
+		int8_t currentOpCode = (currentInstruction & 0xFF000) >> 12;
+
 
 	}
 
