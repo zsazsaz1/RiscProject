@@ -214,7 +214,9 @@ void lw (int rd, int rs, int rt)
 
 void sw (int rd, int rs, int rt)
 {
-	return 1;
+	jumpOpCodeStart(rd, rs, rt);
+	Ram[Registers[rs] + Registers[rt]] = Registers[rd];
+	PC++;
 }
 
 void reti (int rd, int rs, int rt)
@@ -234,7 +236,7 @@ void out (int rd, int rs, int rt)
 
 void halt (int rd, int rs, int rt)
 {
-	return 1;
+	exit(0);
 }
 
 void(*OpcodeMap[22])(int, int, int) = { 
