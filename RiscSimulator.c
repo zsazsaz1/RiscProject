@@ -42,8 +42,10 @@ int readFileAsHex(char filename[], int out_array[], int size)
 
 int main(int argc, char* argv[])
 {
-	int a = readFileAsHex(argv[1], InstructionRam, INSTRUCTION_RAM_SIZE);
-	int b = readFileAsHex(argv[2], Ram, RAM_SIZE);
+	readFileAsHex(argv[1], InstructionRam, INSTRUCTION_RAM_SIZE);
+	readFileAsHex(argv[2], Ram, RAM_SIZE);
+
+	int32_t a = -((0x80001 ^ 0xFFFFF) + 1);
 
 	while (1) {
 		int32_t currentInstruction = InstructionRam[PC];
