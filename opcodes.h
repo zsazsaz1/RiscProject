@@ -1,4 +1,3 @@
 #pragma once
-#define USED_IMMEDIATE 1
 
-extern int (*OpcodeMap[22])();
+extern void (*OpcodeMap[22])(int, int, int);

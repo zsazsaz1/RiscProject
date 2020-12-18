@@ -48,8 +48,10 @@ int main(int argc, char* argv[])
 	while (1) {
 		int32_t currentInstruction = InstructionRam[PC];
 		int8_t currentOpCode = (currentInstruction & 0xFF000) >> 12;
-
-
+		int8_t rd = (currentInstruction & 0xF00) >> 8;
+		int8_t rs = (currentInstruction & 0xF0) >> 4;
+		int8_t rt = (currentInstruction & 0xF) ;
+		OpcodeMap[currentOpCode](rd, rs, rt);
 	}
 
 	return 0;

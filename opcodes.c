@@ -1,118 +1,130 @@
 #include <stdio.h>
 #include <inttypes.h>
+#include "opcodes.h"
 #include "singltons.h"
 
-int add (int rd, int rs, int rt)
+void add (int rd, int rs, int rt)
+{
+	if (1 == rd)
+	{
+		printf("rd in add cant be $imm");
+		exit(1);
+	}
+	if (rs == 1 || rt == 1) {
+		Registers[1] = InstructionRam[PC + 1];
+		PC++;
+	}
+	Registers[rd] = Registers[rs] + Registers[rt];
+
+	PC++;
+}
+
+void sub (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int sub (int rd, int rs, int rt)
+void and (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int and (int rd, int rs, int rt)
+void or (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int or (int rd, int rs, int rt)
+void xor (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int xor (int rd, int rs, int rt)
+void mul (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int mul (int rd, int rs, int rt)
+void sll (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int sll (int rd, int rs, int rt)
+void sra (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int sra (int rd, int rs, int rt)
+void srl (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int srl (int rd, int rs, int rt)
+void beq (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int beq (int rd, int rs, int rt)
+void bne (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int bne (int rd, int rs, int rt)
+void blt (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int blt (int rd, int rs, int rt)
+void bgt (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int bgt (int rd, int rs, int rt)
+void ble (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int ble (int rd, int rs, int rt)
+void bge (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int bge (int rd, int rs, int rt)
+void jal (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int jal (int rd, int rs, int rt)
+void lw (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int lw (int rd, int rs, int rt)
+void sw (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int sw (int rd, int rs, int rt)
+void reti (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int reti (int rd, int rs, int rt)
+void in (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int in (int rd, int rs, int rt)
+void out (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int out (int rd, int rs, int rt)
+void halt (int rd, int rs, int rt)
 {
 	return 1;
 }
 
-int halt (int rd, int rs, int rt)
-{
-	return 1;
-}
-
-int(*OpcodeMap[22])(int, int, int) = { 
+void(*OpcodeMap[22])(int, int, int) = { 
 	add,
 	sub,
 	and,
