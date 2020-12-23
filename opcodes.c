@@ -10,6 +10,18 @@
 void CycleIncreament()
 {
 	Cycle++;
+	if (timerenable) 
+	{
+		if(timercurrent == timermax)
+		{
+			irqStatus |= 0b001;
+			timercurrent = 0;
+		}
+		else 
+		{
+			timercurrent++;
+		}
+	}
 }
 
 void PCAndCycleIncrement()
@@ -238,7 +250,7 @@ void sw (int rd, int rs, int rt)
 void reti (int rd, int rs, int rt)
 {
 	PC = getIORegister(7);
-	interupted = 0;
+	Interupted = 0;
 	CycleIncreament();
 }
 
@@ -259,7 +271,7 @@ void out (int rd, int rs, int rt)
 void halt (int rd, int rs, int rt)
 {
 	CycleIncreament();
-	exit(0);
+	ShouldExit = 1;
 }
 
 void(*OpcodeMap[22])(int, int, int) = { 

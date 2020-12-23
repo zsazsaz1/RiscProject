@@ -8,3 +8,6 @@ extern char irqEnable;
 extern char irqStatus;
 extern int16_t irqhandler;
 extern int16_t irqreturn;
+extern char timerenable; // 1 bit
+extern int32_t timercurrent;
+extern int32_t timermax;
