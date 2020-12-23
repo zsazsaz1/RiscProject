@@ -139,11 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="IO.c" />
     <ClCompile Include="opcodes.c" />
     <ClCompile Include="RiscSimulator.c" />
     <ClCompile Include="singletons.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IO.h" />
     <ClInclude Include="opcodes.h" />
     <ClInclude Include="singltons.h" />
   </ItemGroup>

@@ -2,18 +2,33 @@
 #include <inttypes.h>
 #include "opcodes.h"
 #include "singltons.h"
+#include "IO.h"
+
+#define IMM 1
+#define RA 15
+
+void PCAndCycleIncrement()
+{
+	PC++;
+	CycleIncreament();
+}
+
+void CycleIncreament()
+{
+	Cycle++;
+}
 
 int32_t getImmediate() 
 {
-	PC++;
+	PCAndCycleIncrement();
 	int isImmSigned = (InstructionRam[PC] & 0x80000) >> 19;
 	if (isImmSigned)
 	{
-		Registers[1] = -((InstructionRam[PC] ^ 0xFFFFF) + 1);
+		Registers[IMM] = -((InstructionRam[PC] ^ 0xFFFFF) + 1);
 	}
 	else
 	{
-		Registers[1] = InstructionRam[PC];
+		Registers[IMM] = InstructionRam[PC];
 	}
 }
 
@@ -24,7 +39,7 @@ void arithmeticOpCodeStart(int rd, int rs, int rt)
 		printf("rd in add cant be $imm");
 		exit(1);
 	}
-	if (rs == 1 || rt == 1) {
+	if (1 == rs || 1 == rt) {
 		getImmediate();
 	}
 }
@@ -35,7 +50,7 @@ void arithmeticOpCodeStop(int rd, int rs, int rt)
 	{
 		Registers[0] = 0;
 	}
-	PC++;
+	PCAndCycleIncrement();
 }
 
 void jumpOpCodeStart(int rd, int rs, int rt)
@@ -49,6 +64,7 @@ void jumpOpCodeStart(int rd, int rs, int rt)
 void jumpToReg(int reg)
 {
 	PC = Registers[reg] & 0x3FF;
+	CycleIncreament();
 }
 
 void add (int rd, int rs, int rt)
@@ -125,7 +141,7 @@ void beq (int rd, int rs, int rt)
 	}
 	else
 	{
-		PC++;
+		PCAndCycleIncrement();
 	}
 }
 
@@ -138,7 +154,7 @@ void bne (int rd, int rs, int rt)
 	}
 	else
 	{
-		PC++;
+		PCAndCycleIncrement();
 	}
 }
 
@@ -151,7 +167,7 @@ void blt (int rd, int rs, int rt)
 	}
 	else
 	{
-		PC++;
+		PCAndCycleIncrement();
 	}
 }
 
@@ -164,7 +180,7 @@ void bgt (int rd, int rs, int rt)
 	}
 	else
 	{
-		PC++;
+		PCAndCycleIncrement();
 	}
 }
 
@@ -177,7 +193,7 @@ void ble (int rd, int rs, int rt)
 	}
 	else
 	{
-		PC++;
+		PCAndCycleIncrement();
 	}
 }
 
@@ -190,7 +206,7 @@ void bge (int rd, int rs, int rt)
 	}
 	else
 	{
-		PC++;
+		PCAndCycleIncrement();
 	}
 }
 
@@ -200,7 +216,7 @@ void jal (int rd, int rs, int rt)
 	{
 		getImmediate();
 	}
-	Registers[15] = PC + 1;
+	Registers[RA] = PC + 1;
 	jumpToReg(rd); // maybe need to check if rd is reg 15
 	
 }
@@ -216,26 +232,32 @@ void sw (int rd, int rs, int rt)
 {
 	jumpOpCodeStart(rd, rs, rt);
 	Ram[Registers[rs] + Registers[rt]] = Registers[rd];
-	PC++;
+	PCAndCycleIncrement();
 }
 
 void reti (int rd, int rs, int rt)
 {
-	return 1;
+	PC = getIORegister(7);
+	CycleIncreament();
 }
 
 void in (int rd, int rs, int rt)
 {
-	return 1;
+	arithmeticOpCodeStart(rd, rs, rt);
+	Registers[rd] = getIORegister(Registers[rs] + Registers[rt]);
+	arithmeticOpCodeStop(rd, rs, rt);
 }
 
 void out (int rd, int rs, int rt)
 {
-	return 1;
+	jumpOpCodeStart(rd, rs, rt);
+	setIORegister(Registers[rs] + Registers[rt], Registers[rd]);
+	PCAndCycleIncrement();
 }
 
 void halt (int rd, int rs, int rt)
 {
+	CycleIncreament();
 	exit(0);
 }
 
@@ -243,7 +265,7 @@ void(*OpcodeMap[22])(int, int, int) = {
 	add,
 	sub,
 	and,
-	or ,
+	or,
 	xor,
 	mul,
 	sll,
