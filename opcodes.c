@@ -7,15 +7,15 @@
 #define IMM 1
 #define RA 15
 
+void CycleIncreament()
+{
+	Cycle++;
+}
+
 void PCAndCycleIncrement()
 {
 	PC++;
 	CycleIncreament();
-}
-
-void CycleIncreament()
-{
-	Cycle++;
 }
 
 int32_t getImmediate() 
@@ -238,6 +238,7 @@ void sw (int rd, int rs, int rt)
 void reti (int rd, int rs, int rt)
 {
 	PC = getIORegister(7);
+	interupted = 0;
 	CycleIncreament();
 }
 

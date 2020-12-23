@@ -10,3 +10,4 @@ extern int16_t PC;
 extern int32_t Cycle;
 extern int32_t InstructionRam[INSTRUCTION_RAM_SIZE];
 extern int32_t Ram[RAM_SIZE];
+extern char interupted;

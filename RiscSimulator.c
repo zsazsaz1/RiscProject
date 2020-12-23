@@ -2,13 +2,14 @@
 
 #include <stdio.h>
 #include <inttypes.h>
-#include "singltons.h";
-#include "opcodes.h";
+#include "singltons.h"
+#include "opcodes.h"
+#include "IO.h"
 
 
-int readFileAsHex(char filename[], int out_array[], int size)
+int readFileAsHex(char filename[], int outArray[], int size)
 {
-	unsigned int instruction;
+	unsigned int memory;
 	FILE* instructionFile = fopen(filename, "r");
 
 	if (NULL == instructionFile) {
@@ -19,19 +20,14 @@ int readFileAsHex(char filename[], int out_array[], int size)
 
 	int i = 0;
 	int scanned;
-	do {
-
-		scanned = fscanf(instructionFile, "%X", &instruction); // TODO: read upper and lower case
-		if (EOF == scanned) {
-			continue;
-		}
-		out_array[i] = instruction;
-
+	while(i < size && fscanf(instructionFile, "%x", &memory) != EOF)
+	{
+		outArray[i] = memory;
 		i++;
-	} while (EOF != scanned && i < INSTRUCTION_RAM_SIZE);
+	}
 
-	while (i < INSTRUCTION_RAM_SIZE) {
-		out_array[i] = 0;
+	while (i < size) {
+		outArray[i] = 0;
 		i++;
 	}
 
@@ -46,6 +42,12 @@ int main(int argc, char* argv[])
 	readFileAsHex(argv[2], Ram, RAM_SIZE);
 
 	while (1) {
+		if (irqEnable & irqStatus && !interupted)
+		{
+			irqreturn = PC;
+			PC = irqhandler;
+			interupted = 1;
+		}
 		int32_t currentInstruction = InstructionRam[PC];
 		int8_t currentOpCode = (currentInstruction & 0xFF000) >> 12;
 		int8_t rd = (currentInstruction & 0xF00) >> 8;

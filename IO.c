@@ -18,7 +18,7 @@ char diskstatus = 0; // 1 bit
 char monitorcmd = 0; // 1 bit
 int16_t monitorx = 0; // 9 bits
 int16_t monitory = 0; // 9 bits
-char monitory = 0;
+char monitordata = 0;
 
 int32_t getIORegister(int8_t IORegisterNum)
 {
@@ -67,7 +67,7 @@ int32_t getIORegister(int8_t IORegisterNum)
 	case 20:
 		return monitory & 0x1FF;
 	case 21:
-		return monitorcmd;
+		return monitordata;
 	default:
 		printf("Attempt to access unrecognized IO register");
 		exit(1);
@@ -145,7 +145,7 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 		monitory = value & 0x1FF;
 		break;
 	case 21:
-		monitorcmd = value;
+		monitordata = value & 0xFF;
 		break;
 	default:
 		printf("Attempt to access unrecognized IO register");
