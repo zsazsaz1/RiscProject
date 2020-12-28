@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 #include "singltons.h"
 #include "opcodes.h"
@@ -91,6 +92,10 @@ int main(int argc, char* argv[])
 	while (!ShouldExit) {
 		if (irqEnable & irqStatus && !Interupted)
 		{
+			if (irqStatus & 0b100) // irq2status == 1
+			{
+				irqStatus &= 0b011; // irq2status = 0
+			}
 			irqreturn = PC;
 			PC = irqhandler;
 			Interupted = 1;

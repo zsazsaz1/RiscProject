@@ -39,11 +39,7 @@ void CycleIncreament()
 		}
 	}
 
-	if (irqStatus & 0b100)
-	{
-		irqStatus &= 0b011; // irq2Status == 0
-	}
-	if(Cycle == irq2stopCycles)
+	if((Cycle - 1) == irq2stopCycles)
 	{
 		irqStatus |= 0b100; // irq2status == 1
 		getNextIrq2StopCycle();
