@@ -12,7 +12,8 @@
 #define DISKIN 3
 #define IRQ2IN 4
 #define DMEMOUT 5
-#define TRACE 6 // should be 7
+#define REGOUT 6
+#define TRACE 7 
 
 void asssertFileOpen(FILE* file, char filename[]) {
 	if (NULL == file) {
@@ -115,6 +116,7 @@ int main(int argc, char* argv[])
 	}
 
 	writeFileAsHex(argv[DMEMOUT], Ram, RAM_SIZE);
+	writeFileAsHex(argv[REGOUT], Registers, REGISTER_COUNT);
 	fclose(irq2in);
 
 	return 0;
