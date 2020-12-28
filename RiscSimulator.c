@@ -9,9 +9,10 @@
  
 #define IMEMIN 1
 #define DMEMIN 2
-#define IRQ2IN 3 // shoudl be 4
-#define DMEMOUT 4 // should be 5
-#define TRACE 5 // should be 7
+#define DISKIN 3
+#define IRQ2IN 4
+#define DMEMOUT 5
+#define TRACE 6 // should be 7
 
 void asssertFileOpen(FILE* file, char filename[]) {
 	if (NULL == file) {
@@ -84,6 +85,7 @@ int main(int argc, char* argv[])
 {
 	readFileAsHex(argv[IMEMIN], InstructionRam, INSTRUCTION_RAM_SIZE);
 	readFileAsHex(argv[DMEMIN], Ram, RAM_SIZE);
+	readFileAsHex(argv[DISKIN], Disk, DISK_SIZE);
 	
 	irq2in = fopen(argv[IRQ2IN], "r");
 	asssertFileOpen(irq2in, argv[IRQ2IN]);

@@ -39,7 +39,7 @@ void CycleIncreament()
 		}
 	}
 
-	if((Cycle - 1) == irq2stopCycles)
+	if((Cycle - 1) == irq2stopCycles) // TODO save interupts to next cycle instead of checking -1
 	{
 		irqStatus |= 0b100; // irq2status == 1
 		getNextIrq2StopCycle();
