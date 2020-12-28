@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_DEPRECATE
+
 #include <stdio.h>
 #include <inttypes.h>
 #include "opcodes.h"
@@ -7,6 +9,20 @@
 #define IMM 1
 #define RA 15
 
+unsigned int irq2stopCycles;
+char resetIrq2Status = 0;
+FILE* irq2in;
+
+void getNextIrq2StopCycle()
+{
+	char error = fscanf(irq2in, "%d", &irq2stopCycles);
+
+	if (EOF == error)
+	{
+		rewind(irq2in);
+	}
+}
+
 void CycleIncreament()
 {
 	Cycle++;
@@ -14,13 +30,23 @@ void CycleIncreament()
 	{
 		if(timercurrent == timermax)
 		{
-			irqStatus |= 0b001;
+			irqStatus |= 0b001; // irq0status == 1
 			timercurrent = 0;
 		}
 		else 
 		{
 			timercurrent++;
 		}
+	}
+
+	if (irqStatus & 0b100)
+	{
+		irqStatus &= 0b011; // irq2Status == 0
+	}
+	if(Cycle == irq2stopCycles)
+	{
+		irqStatus |= 0b100; // irq2status == 1
+		getNextIrq2StopCycle();
 	}
 }
 

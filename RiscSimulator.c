@@ -5,25 +5,28 @@
 #include "singltons.h"
 #include "opcodes.h"
 #include "IO.h"
-
+ 
 #define IMEMIN 1
 #define DMEMIN 2
-#define DMEMOUT 3 // should be 6
-#define TRACE 4 // should be 6
+#define IRQ2IN 3 // shoudl be 4
+#define DMEMOUT 4 // should be 5
+#define TRACE 5 // should be 7
 
-int readFileAsHex(char filename[], int outArray[], int size)
+void asssertFileOpen(FILE* file, char filename[]) {
+	if (NULL == file) {
+		printf("Error opening file %s!\n", filename);
+		exit(1);
+	}
+}
+
+void readFileAsHex(char filename[], int outArray[], int size)
 {
 	unsigned int memory;
 	FILE* file = fopen(filename, "r");
 
-	if (NULL == file) {
-		printf("Error opening file!\n");
-
-		return -1;
-	}
+	asssertFileOpen(file, filename);
 
 	int i = 0;
-	int scanned;
 	while(i < size && fscanf(file, "%x", &memory) != EOF)
 	{
 		outArray[i] = memory;
@@ -36,20 +39,13 @@ int readFileAsHex(char filename[], int outArray[], int size)
 	}
 
 	fclose(file);
-
-	return 0;
 }
 
-int writeFileAsHex(char filename[], int inArray[], int size)
+void writeFileAsHex(char filename[], int inArray[], int size)
 {
-	unsigned int memory;
 	FILE* file = fopen(filename, "w");
 
-	if (NULL == file) {
-		printf("Error opening file!\n");
-
-		return -1;
-	}
+	asssertFileOpen(file, filename);
 
 	for (int i = 0; i < size; i++)
 	{
@@ -57,15 +53,11 @@ int writeFileAsHex(char filename[], int inArray[], int size)
 	}
 }
 
-int writeTraceToFile(char filename[], int16_t lastPC, int32_t registers[], int32_t instruction)
+void writeTraceToFile(char filename[], int16_t lastPC, int32_t registers[], int32_t instruction)
 {
-	unsigned int memory;
 	FILE* file = fopen(filename, "a");
 
-	if (NULL == file) {
-		printf("Error opening file!\n");
-		return -1;
-	}
+	asssertFileOpen(file, filename);
 
 	fprintf(file, "%03X %05X", lastPC, instruction);
 	for (int i = 0; i < REGISTER_COUNT; i++)
@@ -91,6 +83,10 @@ int main(int argc, char* argv[])
 {
 	readFileAsHex(argv[IMEMIN], InstructionRam, INSTRUCTION_RAM_SIZE);
 	readFileAsHex(argv[DMEMIN], Ram, RAM_SIZE);
+	
+	irq2in = fopen(argv[IRQ2IN], "r");
+	asssertFileOpen(irq2in, argv[IRQ2IN]);
+	getNextIrq2StopCycle();
 
 	while (!ShouldExit) {
 		if (irqEnable & irqStatus && !Interupted)
@@ -112,6 +108,7 @@ int main(int argc, char* argv[])
 	}
 
 	writeFileAsHex(argv[DMEMOUT], Ram, RAM_SIZE);
+	fclose(irq2in);
 
 	return 0;
 }
