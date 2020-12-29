@@ -23,27 +23,43 @@ void getNextIrq2StopCycle()
 	}
 }
 
+char timerIntterupt = 0;
+char irq2Intterupt = 0;
+
 void CycleIncreament()
 {
 	Cycle++;
-	if (timerenable) 
+
+	if (timerIntterupt)
 	{
-		if(timercurrent == timermax)
+		irqStatus |= 0b001; // irq0status == 1
+		timerIntterupt = 0;
+	}
+	if (irq2Intterupt)
+	{
+		irqStatus |= 0b100; // irq2status == 1
+		irq2Intterupt = 0;
+	}
+
+	if (timerenable)
+	{
+		if (timercurrent == timermax)
 		{
-			irqStatus |= 0b001; // irq0status == 1
+			timerIntterupt = 1;
 			timercurrent = 0;
 		}
-		else 
+		else
 		{
 			timercurrent++;
 		}
 	}
 
-	if((Cycle - 1) == irq2stopCycles) // TODO save interupts to next cycle instead of checking -1
+	if (Cycle == irq2stopCycles)
 	{
-		irqStatus |= 0b100; // irq2status == 1
+		irq2Intterupt = 1;
 		getNextIrq2StopCycle();
 	}
+
 }
 
 void PCAndCycleIncrement()
