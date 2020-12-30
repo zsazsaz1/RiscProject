@@ -1,6 +1,9 @@
+#define _CRT_SECURE_NO_DEPRECATE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include "singltons.h"
 
 char irqEnable = 0; // first bit is irq0, second 1, and third 2.
 char irqStatus = 0; // first bit is irq0, second 1, and third 2.
@@ -20,60 +23,79 @@ char monitorcmd = 0; // 1 bit
 int16_t monitorx = 0; // 9 bits
 int16_t monitory = 0; // 9 bits
 char monitordata = 0;
+char *hwregtraceFileName;
+
+extern void asssertFileOpen(FILE* file, char filename[]);
+
+void writeHwregtraceToFile(char filename[], int32_t cycle, char ReadorWrite[], char name[], int32_t data)
+{
+	FILE* file = fopen(filename, "a");
+
+	asssertFileOpen(file, filename);
+
+	fprintf(file, "%d %s %s %08X", cycle, ReadorWrite, name, data);
+
+	fprintf(file, "\n");
+	fclose(file);
+}
+
 
 int32_t getIORegister(int8_t IORegisterNum)
 {
+	int32_t retValue;
 	switch (IORegisterNum)
 	{
 	case 0:
-		return (irqEnable & 0b001) ? 1 : 0;
+		retValue = (irqEnable & 0b001) ? 1 : 0;
 	case 1:
-		return (irqEnable & 0b010) ? 1 : 0;
+		retValue = (irqEnable & 0b010) ? 1 : 0;
 	case 2:
-		return (irqEnable & 0b100) ? 1 : 0;
+		retValue = (irqEnable & 0b100) ? 1 : 0;
 	case 3:
-		return (irqStatus & 0b001) ? 1 : 0;
+		retValue = (irqStatus & 0b001) ? 1 : 0;
 	case 4:
-		return (irqStatus & 0b010) ? 1 : 0;
+		retValue = (irqStatus & 0b010) ? 1 : 0;
 	case 5:
-		return (irqStatus & 0b100) ? 1 : 0;
+		retValue = (irqStatus & 0b100) ? 1 : 0;
 	case 6:
-		return irqhandler & 0x3FF;
+		retValue = irqhandler & 0x3FF;
 	case 7:
-		return irqreturn & 0x3FF;
+		retValue = irqreturn & 0x3FF;
 	case 8:
-		return clks;
+		retValue = clks;
 	case 9:
-		return leds;
+		retValue = leds;
 	case 10:
-		return reserved;
+		retValue = reserved;
 	case 11:
-		return timerenable & 1;
+		retValue = timerenable & 1;
 	case 12:
-		return timercurrent;
+		retValue = timercurrent;
 	case 13:
-		return timermax;
+		retValue = timermax;
 	case 14:
-		return diskcmd & 0b11;
+		retValue = diskcmd & 0b11;
 	case 15:
-		return disksector & 0xBF;
+		retValue = disksector & 0xBF;
 	case 16:
-		return diskbuffer & 0xFFF;
+		retValue = diskbuffer & 0xFFF;
 	case 17:
-		return diskstatus & 0b1;
+		retValue = diskstatus & 0b1;
 	case 18:
-		return monitorcmd & 0b1;
+		retValue = monitorcmd & 0b1;
 	case 19:
-		return monitorx & 0x1FF;
+		retValue = monitorx & 0x1FF;
 	case 20:
-		return monitory & 0x1FF;
+		retValue = monitory & 0x1FF;
 	case 21:
-		return monitordata;
+		retValue = monitordata;
 	default:
 		printf("Attempt to access unrecognized IO register");
 		exit(1);
-		return -1;
+		return  -1;
 	}
+	writeHwregtraceToFile(hwregtraceFileName, Cycle, "READ", getIORegName(IORegisterNum), retValue);
+	return retValue;
 }
 
 
@@ -153,5 +175,6 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 		break;
 
 	}
+	writeHwregtraceToFile(hwregtraceFileName, Cycle, "WRITE", getIORegName(IORegisterNum), value);
 }
 
