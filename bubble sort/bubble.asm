@@ -1,5 +1,5 @@
 	jal $imm, $zero, $zero, bubble         # call bubble (no input arguments) :0
-	halt $zero, $zero, $zero, 0	           # halt :2
+	halt $zero, $zero, $zero, 0	       # halt :2
 
 bubble:
 	add $sp, $sp, $imm, -2                 # adjust stack for 2 items :3 
@@ -34,10 +34,10 @@ swap:
 	beq $imm, $zero, $zero, LOOP2          # continue the loop  
 
 end:
-	lw $s1, $sp, $imm, 0		               # restore $s1
-	lw $s0, $sp, $imm, 1	                 # restore $s0
-	add $sp, $sp, $imm, 2		               # pop 2 items from stack
-	beq $ra, $zero, $zero, 0	             # return
+	lw $s1, $sp, $imm, 0		        # restore $s1
+	lw $s0, $sp, $imm, 1	                # restore $s0
+	add $sp, $sp, $imm, 2		        # pop 2 items from stack
+	beq $ra, $zero, $zero, 0	        # return
 
 .word 1024 1
 .word 1025 2
