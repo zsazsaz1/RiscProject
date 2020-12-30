@@ -28,11 +28,13 @@ int32_t RegistersCopy[REGISTER_COUNT];
 void asssertFileOpen(FILE* file, char filename[]);
 void readFileAsHex(char filename[], int outArray[], int size);
 void writeFileAsHex(char filename[], int inArray[], int size);
+void writeFileAsDec(char filename[], int32_t numofAssemblyOp);
 void writeTraceToFile(char filename[], int16_t lastPC, int32_t registers[], int32_t instruction);
 void CopyRegisters();
 
 int main(int argc, char* argv[])
 {
+	ledsFileName = argv[LEDS];
 	hwregtraceFileName = argv[HWREGTRACE];
 	readFileAsHex(argv[IMEMIN], InstructionRam, INSTRUCTION_RAM_SIZE);
 	readFileAsHex(argv[DMEMIN], Ram, RAM_SIZE);
@@ -42,6 +44,7 @@ int main(int argc, char* argv[])
 	asssertFileOpen(irq2in, argv[IRQ2IN]);
 	getNextIrq2StopCycle();
 
+	int32_t numofAssemblyOperations = 0;
 	while (!ShouldExit) {
 		if (irqEnable & irqStatus && !Interupted)
 		{
@@ -63,10 +66,14 @@ int main(int argc, char* argv[])
 		OpcodeMap[currentOpCode](rd, rs, rt);
 		RegistersCopy[1] = Registers[1];
 		writeTraceToFile(argv[TRACE], lastPC, RegistersCopy, currentInstruction);
+
+		numofAssemblyOperations++;
 	}
 
 	writeFileAsHex(argv[DMEMOUT], Ram, RAM_SIZE);
 	writeFileAsHex(argv[REGOUT], Registers, REGISTER_COUNT);
+	writeFileAsDec(argv[CYCLES], numofAssemblyOperations);
+	
 	fclose(irq2in);
 
 	return 0;
@@ -112,6 +119,17 @@ void writeFileAsHex(char filename[], int inArray[], int size)
 	{
 		fprintf(file, "%08X\n", inArray[i]);
 	}
+}
+
+void writeFileAsDec(char filename[], int32_t numofAssemblyOp)
+{
+	FILE* file = fopen(filename, "w");
+
+	asssertFileOpen(file, filename);
+
+
+	fprintf(file, "%d\n" "%d", Cycle, numofAssemblyOp);
+	
 }
 
 void writeTraceToFile(char filename[], int16_t lastPC, int32_t registers[], int32_t instruction)

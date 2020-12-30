@@ -141,7 +141,7 @@
   <ItemGroup>
     <ClCompile Include="IO.c" />
     <ClCompile Include="opcodes.c" />
-    <ClCompile Include="RiscSimulator.c" />
+    <ClCompile Include="main.c" />
     <ClCompile Include="singletons.c" />
   </ItemGroup>
   <ItemGroup>

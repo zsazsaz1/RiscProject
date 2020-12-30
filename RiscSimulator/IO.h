@@ -12,3 +12,5 @@ extern char timerenable; // 1 bit
 extern int32_t timercurrent;
 extern int32_t timermax;
 extern char *hwregtraceFileName;
+extern char *ledsFileName;
+extern int16_t irqreturn;

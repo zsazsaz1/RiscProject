@@ -23,17 +23,33 @@ char monitorcmd = 0; // 1 bit
 int16_t monitorx = 0; // 9 bits
 int16_t monitory = 0; // 9 bits
 char monitordata = 0;
-char *hwregtraceFileName;
+char* hwregtraceFileName;
+char* ledsFileName;
 
-extern void asssertFileOpen(FILE* file, char filename[]);
+void asssertFileOpen(FILE* file, char filename[]);
 
-void writeHwregtraceToFile(char filename[], int32_t cycle, char ReadorWrite[], char name[], int32_t data)
+char* getIORegisterName(int8_t IORegisterNum);
+
+void writeHwregtraceToFile(char filename[], int32_t cycle, char ReadorWrite[], int8_t IORegisterNum, int32_t data)
 {
+	char* name = getIORegisterName(IORegisterNum);
 	FILE* file = fopen(filename, "a");
 
 	asssertFileOpen(file, filename);
 
 	fprintf(file, "%d %s %s %08X", cycle, ReadorWrite, name, data);
+
+	fprintf(file, "\n");
+	fclose(file);
+}
+
+void writeLedsStatusTofile(char filename[], int32_t ledsStatus)
+{
+	FILE* file = fopen(filename, "a");
+
+	asssertFileOpen(file, filename);
+
+	fprintf(file, "%d %08X", Cycle, ledsStatus);
 
 	fprintf(file, "\n");
 	fclose(file);
@@ -47,54 +63,76 @@ int32_t getIORegister(int8_t IORegisterNum)
 	{
 	case 0:
 		retValue = (irqEnable & 0b001) ? 1 : 0;
+		break;
 	case 1:
 		retValue = (irqEnable & 0b010) ? 1 : 0;
+		break;
 	case 2:
 		retValue = (irqEnable & 0b100) ? 1 : 0;
+		break;
 	case 3:
 		retValue = (irqStatus & 0b001) ? 1 : 0;
+		break;
 	case 4:
 		retValue = (irqStatus & 0b010) ? 1 : 0;
+		break;
 	case 5:
 		retValue = (irqStatus & 0b100) ? 1 : 0;
+		break;
 	case 6:
 		retValue = irqhandler & 0x3FF;
+		break;
 	case 7:
 		retValue = irqreturn & 0x3FF;
+		break;
 	case 8:
 		retValue = clks;
+		break;
 	case 9:
 		retValue = leds;
+		break;
 	case 10:
 		retValue = reserved;
+		break;
 	case 11:
 		retValue = timerenable & 1;
+		break;
 	case 12:
 		retValue = timercurrent;
+		break;
 	case 13:
 		retValue = timermax;
+		break;
 	case 14:
 		retValue = diskcmd & 0b11;
+		break;
 	case 15:
 		retValue = disksector & 0xBF;
+		break;
 	case 16:
 		retValue = diskbuffer & 0xFFF;
+		break;
 	case 17:
 		retValue = diskstatus & 0b1;
+		break;
 	case 18:
 		retValue = monitorcmd & 0b1;
+		break;
 	case 19:
 		retValue = monitorx & 0x1FF;
+		break;
 	case 20:
 		retValue = monitory & 0x1FF;
+		break;
 	case 21:
 		retValue = monitordata;
+		break;
 	default:
 		printf("Attempt to access unrecognized IO register");
 		exit(1);
-		return  -1;
+		return -1;
 	}
-	writeHwregtraceToFile(hwregtraceFileName, Cycle, "READ", getIORegName(IORegisterNum), retValue);
+	writeHwregtraceToFile(hwregtraceFileName, Cycle, "READ", IORegisterNum, retValue);
 	return retValue;
 }
 
@@ -132,6 +170,7 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 		break;
 	case 9:
 		leds = value;
+		writeLedsStatusTofile(ledsFileName, value);
 		break;
 	case 10:
 		reserved = value;
@@ -172,9 +211,63 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 	default:
 		printf("Attempt to access unrecognized IO register");
 		exit(1);
-		break;
-
+		return;
 	}
-	writeHwregtraceToFile(hwregtraceFileName, Cycle, "WRITE", getIORegName(IORegisterNum), value);
+	writeHwregtraceToFile(hwregtraceFileName, Cycle, "WRITE", IORegisterNum, value);
 }
 
+char* getIORegisterName(int8_t IORegisterNum)
+{
+	switch (IORegisterNum)
+	{
+	case 0:
+		return "irq0enable";
+	case 1:
+		return "irq1enable";
+	case 2:
+		return "irq2enable";
+	case 3:
+		return "irq0status";
+	case 4:
+		return "irq1status";
+	case 5:
+		return "irq2status";
+	case 6:
+		return "irqhandler";
+	case 7:
+		return "irqreturn";
+	case 8:
+		return "clks";
+	case 9:
+		return "leds";
+	case 10:
+		return "reserved";
+	case 11:
+		return "timerenable";
+	case 12:
+		return "timercurrent";
+	case 13:
+		return "timermax";
+	case 14:
+		return "diskcmd";
+	case 15:
+		return "disksector";
+	case 16:
+		return "diskbuffer";
+	case 17:
+		return "diskstatus";
+	case 18:
+		return "monitorcmd";
+	case 19:
+		return "monitorx";
+	case 20:
+		return "monitory";
+	case 21:
+		return "monitordata";
+	default:
+		printf("Attempt to access unrecognized IO register");
+		exit(1);
+		return "1";
+	}
+
+}
