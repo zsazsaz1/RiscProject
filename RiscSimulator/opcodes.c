@@ -1,74 +1,11 @@
-#define _CRT_SECURE_NO_DEPRECATE
-
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 #include "opcodes.h"
 #include "singltons.h"
 #include "IO.h"
 
-#define IMM 1
-#define RA 15
-
-unsigned int irq2stopCycles;
-char resetIrq2Status = 0;
-FILE* irq2in;
-
-void getNextIrq2StopCycle()
-{
-	char error = fscanf(irq2in, "%d", &irq2stopCycles);
-
-	if (EOF == error)
-	{
-		rewind(irq2in);
-	}
-}
-
-char timerIntterupt = 0;
-char irq2Intterupt = 0;
-
-void CycleIncreament()
-{
-	Cycle++;
-
-	if (timerIntterupt)
-	{
-		irqStatus |= 0b001; // irq0status == 1
-		timerIntterupt = 0;
-	}
-	if (irq2Intterupt)
-	{
-		irqStatus |= 0b100; // irq2status == 1
-		irq2Intterupt = 0;
-	}
-
-	if (timerenable)
-	{
-		if (timercurrent == timermax)
-		{
-			timerIntterupt = 1;
-			timercurrent = 0;
-		}
-		else
-		{
-			timercurrent++;
-		}
-	}
-
-	if (Cycle == irq2stopCycles)
-	{
-		irq2Intterupt = 1;
-		getNextIrq2StopCycle();
-	}
-
-}
-
-void PCAndCycleIncrement()
-{
-	PC++;
-	CycleIncreament();
-}
-
-int32_t getImmediate() 
+void getImmediate() 
 {
 	PCAndCycleIncrement();
 	int isImmSigned = (InstructionRam[PC] & 0x80000) >> 19;
@@ -82,7 +19,7 @@ int32_t getImmediate()
 	}
 }
 
-void arithmeticOpCodeStart(int rd, int rs, int rt)
+void assignOperationStart(int rd, int rs, int rt)
 {
 	if (1 == rd)
 	{
@@ -94,7 +31,7 @@ void arithmeticOpCodeStart(int rd, int rs, int rt)
 	}
 }
 
-void arithmeticOpCodeStop(int rd, int rs, int rt)
+void assignOperationStop(int rd, int rs, int rt)
 {
 	if (0 == rd)
 	{
@@ -103,10 +40,10 @@ void arithmeticOpCodeStop(int rd, int rs, int rt)
 	PCAndCycleIncrement();
 }
 
-void jumpOpCodeStart(int rd, int rs, int rt)
+void nonAssignStart(int rd, int rs, int rt)
 {
 	if (1 == rd || 1 == rs || 1 == rt)
-	{
+	{	
 		getImmediate();
 	}
 }
@@ -119,72 +56,72 @@ void jumpToReg(int reg)
 
 void add (int rd, int rs, int rt)
 {
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = Registers[rs] + Registers[rt];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void sub (int rd, int rs, int rt)
 {
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = Registers[rs] - Registers[rt];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void and (int rd, int rs, int rt)
 {
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = Registers[rs] & Registers[rt];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void or (int rd, int rs, int rt)
 {
 
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = Registers[rs] | Registers[rt];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void xor (int rd, int rs, int rt)
 {
 
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = Registers[rs] ^ Registers[rt];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 void mul (int rd, int rs, int rt)
 {
 
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = Registers[rs] * Registers[rt];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void sll (int rd, int rs, int rt)
 {
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = (unsigned)Registers[rs] << Registers[rt];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void sra (int rd, int rs, int rt)
 {
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = Registers[rs] >> Registers[rt];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void srl (int rd, int rs, int rt)
 {
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = (unsigned)Registers[rs] >> Registers[rt];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void beq (int rd, int rs, int rt)
 {
-	jumpOpCodeStart(rd, rs, rt);
+	nonAssignStart(rd, rs, rt);
 	if (Registers[rs] == Registers[rt])
 	{
 		jumpToReg(rd);
@@ -197,7 +134,7 @@ void beq (int rd, int rs, int rt)
 
 void bne (int rd, int rs, int rt)
 {
-	jumpOpCodeStart(rd, rs, rt);
+	nonAssignStart(rd, rs, rt);
 	if (Registers[rs] != Registers[rt])
 	{
 		jumpToReg(rd);
@@ -210,7 +147,7 @@ void bne (int rd, int rs, int rt)
 
 void blt (int rd, int rs, int rt)
 {
-	jumpOpCodeStart(rd, rs, rt);
+	nonAssignStart(rd, rs, rt);
 	if (Registers[rs] < Registers[rt])
 	{
 		jumpToReg(rd);
@@ -223,7 +160,7 @@ void blt (int rd, int rs, int rt)
 
 void bgt (int rd, int rs, int rt)
 {
-	jumpOpCodeStart(rd, rs, rt);
+	nonAssignStart(rd, rs, rt);
 	if (Registers[rs] > Registers[rt])
 	{
 		jumpToReg(rd);
@@ -236,7 +173,7 @@ void bgt (int rd, int rs, int rt)
 
 void ble (int rd, int rs, int rt)
 {
-	jumpOpCodeStart(rd, rs, rt);
+	nonAssignStart(rd, rs, rt);
 	if (Registers[rs] <= Registers[rt])
 	{
 		jumpToReg(rd);
@@ -249,7 +186,7 @@ void ble (int rd, int rs, int rt)
 
 void bge (int rd, int rs, int rt)
 {
-	jumpOpCodeStart(rd, rs, rt);
+	nonAssignStart(rd, rs, rt);
 	if (Registers[rs] >= Registers[rt])
 	{
 		jumpToReg(rd);
@@ -273,14 +210,14 @@ void jal (int rd, int rs, int rt)
 
 void lw (int rd, int rs, int rt)
 {
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = Ram[Registers[rs] + Registers[rt]];
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void sw (int rd, int rs, int rt)
 {
-	jumpOpCodeStart(rd, rs, rt);
+	nonAssignStart(rd, rs, rt);
 	Ram[Registers[rs] + Registers[rt]] = Registers[rd];
 	PCAndCycleIncrement();
 }
@@ -294,14 +231,14 @@ void reti (int rd, int rs, int rt)
 
 void in (int rd, int rs, int rt)
 {
-	arithmeticOpCodeStart(rd, rs, rt);
+	assignOperationStart(rd, rs, rt);
 	Registers[rd] = getIORegister(Registers[rs] + Registers[rt]);
-	arithmeticOpCodeStop(rd, rs, rt);
+	assignOperationStop(rd, rs, rt);
 }
 
 void out (int rd, int rs, int rt)
 {
-	jumpOpCodeStart(rd, rs, rt);
+	nonAssignStart(rd, rs, rt);
 	setIORegister(Registers[rs] + Registers[rt], Registers[rd]);
 	PCAndCycleIncrement();
 }
