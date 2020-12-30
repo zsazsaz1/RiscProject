@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 
 char irqEnable = 0; // first bit is irq0, second 1, and third 2.
@@ -71,8 +72,7 @@ int32_t getIORegister(int8_t IORegisterNum)
 	default:
 		printf("Attempt to access unrecognized IO register");
 		exit(1);
-		break;
-
+		return -1;
 	}
 }
 
