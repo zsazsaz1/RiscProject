@@ -292,19 +292,23 @@ void monitorInitializer()
 	}
 }
 
-void writeMonitorToFile(char filename[])
+void writeMonitorToFile(char monitorFileName[], char monitorYuvFileName[])
 {
-	FILE* file = fopen(filename, "a");
+	FILE* monitorFile = fopen(monitorFileName, "w");
+	FILE* monitorYuvFile = fopen(monitorYuvFileName, "wb");
 
-	asssertFileOpen(file, filename);
+	asssertFileOpen(monitorFile, monitorFileName);
+	asssertFileOpen(monitorYuvFile, monitorFileName);
 
 	for (int16_t i = 0; i < MONITOR_Y; i++)
 	{
 		for (int16_t j = 0; j < MONITOR_X; j++)
 		{
-			fprintf(file, "%02X\n", Monitor[j][i]);
+			fprintf(monitorFile, "%02X\n", Monitor[j][i]);
+			fwrite(&Monitor[j][i], sizeof(uint8_t), 1, monitorYuvFile);
 		}
 	}
 
-	fclose(file);
+	fclose(monitorFile);
+	fclose(monitorYuvFile);
 }

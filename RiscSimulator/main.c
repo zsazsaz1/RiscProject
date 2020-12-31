@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	writeFileAsHex(argv[DMEMOUT], Ram, RAM_SIZE);
 	writeFileAsHex(argv[REGOUT], Registers, REGISTER_COUNT);
 	writeFileAsDec(argv[CYCLES], numofAssemblyOperations);
-	writeMonitorToFile(argv[MONITOR]);
+	writeMonitorToFile(argv[MONITOR], argv[MONITOR_YUV]);
 
 	fclose(irq2in);
 

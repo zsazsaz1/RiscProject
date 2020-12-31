@@ -19,4 +19,4 @@ extern uint8_t Monitor[MONITOR_X][MONITOR_Y];
 int32_t getIORegister(int8_t IORegisterNum);
 void setIORegister(int8_t IORegisterNum, int32_t value);
 void monitorInitializer();
-void writeMonitorToFile(char filename[]);
+void writeMonitorToFile(char monitorFileName[], char monitorYuvFileName[]);
