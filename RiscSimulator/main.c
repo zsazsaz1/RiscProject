@@ -39,7 +39,8 @@ int main(int argc, char* argv[])
 	readFileAsHex(argv[IMEMIN], InstructionRam, INSTRUCTION_RAM_SIZE);
 	readFileAsHex(argv[DMEMIN], Ram, RAM_SIZE);
 	readFileAsHex(argv[DISKIN], Disk, DISK_SIZE);
-	
+	monitorInitializer();
+
 	irq2in = fopen(argv[IRQ2IN], "r");
 	asssertFileOpen(irq2in, argv[IRQ2IN]);
 	getNextIrq2StopCycle();
@@ -73,7 +74,8 @@ int main(int argc, char* argv[])
 	writeFileAsHex(argv[DMEMOUT], Ram, RAM_SIZE);
 	writeFileAsHex(argv[REGOUT], Registers, REGISTER_COUNT);
 	writeFileAsDec(argv[CYCLES], numofAssemblyOperations);
-	
+	writeMonitorToFile(argv[MONITOR]);
+
 	fclose(irq2in);
 
 	return 0;
@@ -127,9 +129,8 @@ void writeFileAsDec(char filename[], int32_t numofAssemblyOp)
 
 	asssertFileOpen(file, filename);
 
-
 	fprintf(file, "%d\n" "%d", Cycle, numofAssemblyOp);
-	
+
 }
 
 void writeTraceToFile(char filename[], int16_t lastPC, int32_t registers[], int32_t instruction)

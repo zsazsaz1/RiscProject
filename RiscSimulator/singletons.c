@@ -10,6 +10,7 @@ int32_t Cycle = 0; // need to be 10 bits
 int32_t InstructionRam[INSTRUCTION_RAM_SIZE]; // need to be 20 bits
 int32_t Ram[RAM_SIZE];
 int32_t Disk[DISK_SIZE];
+int8_t Monitor[352][288];
 char Interupted = 0;
 char ShouldExit = 0;
 

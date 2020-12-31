@@ -4,17 +4,20 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include "singltons.h"
+#include "IO.h"
+
+uint8_t Monitor[MONITOR_X][MONITOR_Y];
 
 char irqEnable = 0; // first bit is irq0, second 1, and third 2.
 char irqStatus = 0; // first bit is irq0, second 1, and third 2.
 int16_t irqhandler = 0; // TD 10 bits
 int16_t irqreturn = 0; // TD 10 bits
-int32_t clks = 0;
-int32_t leds = 0;
+int32_t clks = 0; // TODO check cycle
+uint32_t leds = 0;
 int32_t reserved = 0;
 char timerenable = 0; // 1 bit
-int32_t timercurrent = 0;
-int32_t timermax = 0;
+uint32_t timercurrent = 0;
+uint32_t timermax = 0;
 char diskcmd = 0; // 2 bits
 char disksector = 0; // 7 bits
 int16_t diskbuffer = 0; // 12 bits
@@ -22,13 +25,14 @@ char diskstatus = 0; // 1 bit
 char monitorcmd = 0; // 1 bit
 int16_t monitorx = 0; // 9 bits
 int16_t monitory = 0; // 9 bits
-char monitordata = 0;
+unsigned char monitordata = 0;
 char* hwregtraceFileName;
 char* ledsFileName;
 
 void asssertFileOpen(FILE* file, char filename[]);
 
 char* getIORegisterName(int8_t IORegisterNum);
+void writePixel();
 
 void writeHwregtraceToFile(char filename[], int32_t cycle, char ReadorWrite[], int8_t IORegisterNum, int32_t data)
 {
@@ -116,7 +120,7 @@ int32_t getIORegister(int8_t IORegisterNum)
 		retValue = diskstatus & 0b1;
 		break;
 	case 18:
-		retValue = monitorcmd & 0b1;
+		retValue = 0; //monitorcmd & 0b1 
 		break;
 	case 19:
 		retValue = monitorx & 0x1FF;
@@ -198,6 +202,7 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 		break;
 	case 18:
 		monitorcmd = value & 0b1;
+		writePixel(); //-----
 		break;
 	case 19:
 		monitorx = value & 0x1FF;
@@ -270,4 +275,36 @@ char* getIORegisterName(int8_t IORegisterNum)
 		return "1";
 	}
 
+}
+
+void writePixel() {
+	Monitor[monitorx][monitory] = monitordata;
+}
+
+void monitorInitializer()
+{
+	for (int16_t i = 0; i < MONITOR_X; i++)
+	{
+		for (int16_t j = 0; j < MONITOR_Y; j++)
+		{
+			Monitor[i][j] = 0;
+		}
+	}
+}
+
+void writeMonitorToFile(char filename[])
+{
+	FILE* file = fopen(filename, "a");
+
+	asssertFileOpen(file, filename);
+
+	for (int16_t i = 0; i < MONITOR_Y; i++)
+	{
+		for (int16_t j = 0; j < MONITOR_X; j++)
+		{
+			fprintf(file, "%02X\n", Monitor[j][i]);
+		}
+	}
+
+	fclose(file);
 }
