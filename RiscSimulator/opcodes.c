@@ -224,7 +224,7 @@ void sw (int rd, int rs, int rt)
 
 void reti (int rd, int rs, int rt)
 {
-	PC = getIORegister(7);
+	PC = irqreturn & 0x3FF;
 	Interupted = 0;
 	CycleIncreament();
 }

@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RiscSimulator.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="opcodes.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -27,15 +24,18 @@
     <ClCompile Include="IO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="singltons.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="IO.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="opcodes.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IO.h">
+    <ClInclude Include="singltons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
