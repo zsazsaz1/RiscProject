@@ -73,6 +73,7 @@ int main(int argc, char* argv[])
 
 	writeFileAsHex(argv[DMEMOUT], Ram, RAM_SIZE);
 	writeFileAsHex(argv[REGOUT], Registers, REGISTER_COUNT);
+	writeFileAsHex(argv[DISKOUT], Disk, DISK_SIZE);
 	writeFileAsDec(argv[CYCLES], numofAssemblyOperations);
 	writeMonitorToFile(argv[MONITOR], argv[MONITOR_YUV]);
 
