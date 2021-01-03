@@ -69,6 +69,11 @@ int main(int argc, char* argv[])
 		writeTraceToFile(argv[TRACE], lastPC, RegistersCopy, currentInstruction);
 
 		numofAssemblyOperations++;
+
+		if (PC >= INSTRUCTION_RAM_SIZE)
+		{
+			ShouldExit = 1;
+		}
 	}
 
 	writeFileAsHex(argv[DMEMOUT], Ram, RAM_SIZE);
