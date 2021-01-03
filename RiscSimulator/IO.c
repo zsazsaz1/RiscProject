@@ -12,7 +12,6 @@ char irqEnable = 0; // first bit is irq0, second 1, and third 2.
 char irqStatus = 0; // first bit is irq0, second 1, and third 2.
 int16_t irqhandler = 0; // TD 10 bits
 int16_t irqreturn = 0; // TD 10 bits
-int32_t clks = 0; // TODO check cycle
 uint32_t leds = 0;
 int32_t reserved = 0;
 char timerenable = 0; // 1 bit
@@ -26,6 +25,7 @@ char monitorcmd = 0; // 1 bit
 int16_t monitorx = 0; // 9 bits
 int16_t monitory = 0; // 9 bits
 unsigned char monitordata = 0;
+uint32_t currentDiskTaskCycle;
 char* hwregtraceFileName;
 char* ledsFileName;
 
@@ -33,6 +33,8 @@ void asssertFileOpen(FILE* file, char filename[]);
 
 char* getIORegisterName(int8_t IORegisterNum);
 void writePixel();
+void readFromDisk();
+void writeToDisk();
 
 void writeHwregtraceToFile(char filename[], int32_t cycle, char ReadorWrite[], int8_t IORegisterNum, int32_t data)
 {
@@ -90,7 +92,7 @@ int32_t getIORegister(int8_t IORegisterNum)
 		retValue = irqreturn & 0x3FF;
 		break;
 	case 8:
-		retValue = clks;
+		retValue = Cycle;
 		break;
 	case 9:
 		retValue = leds;
@@ -170,7 +172,7 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 		irqreturn = value & 0x3FF;
 		break;
 	case 8:
-		clks = value;
+		//clks is a read only variable for us
 		break;
 	case 9:
 		leds = value;
@@ -189,7 +191,15 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 		timermax = value;
 		break;
 	case 14:
-		diskcmd = value & 0b11;
+		if (0 == diskcmd) // in order to prevent the assembler access to the disk while it's in the middle of a previous task
+		{
+			diskcmd = value & 0b11;
+			if ((1 == diskcmd) | (2 == diskcmd))
+			{
+				diskstatus = 1;
+				currentDiskTaskCycle = Cycle;
+			}
+		}
 		break;
 	case 15:
 		disksector = value & 0xBF;
@@ -311,4 +321,22 @@ void writeMonitorToFile(char monitorFileName[], char monitorYuvFileName[])
 
 	fclose(monitorFile);
 	fclose(monitorYuvFile);
+}
+
+void readFromDisk()
+{
+	int16_t diskSectorPointer = disksector * SECTOR_SIZE;
+	for (int16_t i = 0; i < SECTOR_SIZE; i++)
+	{
+		Ram[diskbuffer + i] = Disk[diskSectorPointer + i];
+	}
+}
+
+void writeToDisk()
+{
+	int16_t diskSectorPointer = disksector * SECTOR_SIZE;
+	for (int16_t i = 0; i < SECTOR_SIZE; i++)
+	{
+		Disk[diskSectorPointer + i] = Ram[diskbuffer + i];
+	}
 }

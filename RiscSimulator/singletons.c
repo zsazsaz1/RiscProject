@@ -66,6 +66,20 @@ void CycleIncreament()
 		getNextIrq2StopCycle();
 	}
 
+	if (Cycle == (currentDiskTaskCycle + DISK_IO_CYCLES))
+	{
+		if (1 == diskcmd)
+		{
+			readFromDisk();
+		}
+		else if (2 == diskcmd)
+		{
+			writeToDisk();
+		}
+		diskcmd = 0;
+		diskstatus = 0;
+		irqStatus |= 0b010; // irq1status == 1
+	}
 }
 
 void PCAndCycleIncrement()
