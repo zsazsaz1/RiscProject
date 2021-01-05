@@ -1,3 +1,5 @@
+	add $sp, $zero, $imm, 1
+	sll $sp, $sp, $imm, 11
 	jal $imm, $zero, $zero, bubble         # call bubble (no input arguments) :0
 	halt $zero, $zero, $zero, 0	       # halt :2
 
