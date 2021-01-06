@@ -29,8 +29,10 @@ void asssertFileOpen(FILE* file, char filename[]);
 void readFileAsHex(char filename[], int outArray[], int size);
 void writeFileAsHex(char filename[], int inArray[], int size);
 void writeFileAsDec(char filename[], int32_t numofAssemblyOp);
-void writeTraceToFile(char filename[], int16_t lastPC, int32_t registers[], int32_t instruction);
+void writeTraceToFile(int16_t lastPC, int32_t registers[], int32_t instruction);
 void CopyRegisters();
+
+FILE* traceFile;
 
 int main(int argc, char* argv[])
 {
@@ -40,6 +42,9 @@ int main(int argc, char* argv[])
 	readFileAsHex(argv[DMEMIN], Ram, RAM_SIZE);
 	readFileAsHex(argv[DISKIN], Disk, DISK_SIZE);
 	monitorInitializer();
+
+	traceFile = fopen(argv[TRACE], "w");
+	asssertFileOpen(traceFile, argv[TRACE]);
 
 	irq2in = fopen(argv[IRQ2IN], "r");
 	asssertFileOpen(irq2in, argv[IRQ2IN]);
@@ -68,7 +73,7 @@ int main(int argc, char* argv[])
 		int8_t rt = (currentInstruction & 0xF);
 		OpcodeMap[currentOpCode](rd, rs, rt);
 		RegistersCopy[1] = Registers[1];
-		writeTraceToFile(argv[TRACE], lastPC, RegistersCopy, currentInstruction);
+		writeTraceToFile(lastPC, RegistersCopy, currentInstruction);
 
 		numofAssemblyOperations++;
 
@@ -85,6 +90,7 @@ int main(int argc, char* argv[])
 	writeMonitorToFile(argv[MONITOR], argv[MONITOR_YUV]);
 
 	fclose(irq2in);
+	fclose(traceFile);
 
 	return 0;
 }
@@ -141,20 +147,15 @@ void writeFileAsDec(char filename[], int32_t numofAssemblyOp)
 
 }
 
-void writeTraceToFile(char filename[], int16_t lastPC, int32_t registers[], int32_t instruction)
+void writeTraceToFile(int16_t lastPC, int32_t registers[], int32_t instruction)
 {
-	FILE* file = fopen(filename, "a");
-
-	asssertFileOpen(file, filename);
-
-	fprintf(file, "%03X %05X", lastPC, instruction);
+	fprintf(traceFile, "%03X %05X", lastPC, instruction);
 	for (int i = 0; i < REGISTER_COUNT; i++)
 	{
-		fprintf(file, " %08X", registers[i]);
+		fprintf(traceFile, " %08X", registers[i]);
 	}
 
-	fprintf(file, "\n");
-	fclose(file);
+	fprintf(traceFile, "\n");
 }
 
 void CopyRegisters()
