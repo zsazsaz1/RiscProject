@@ -49,10 +49,12 @@ int main(int argc, char* argv[])
 	while (!ShouldExit) {
 		if (irqEnable & irqStatus && !Interupted)
 		{
+			/*
+			we understood from the fib example, that it is the assembly responsability to reset irq2
 			if (irqStatus & 0b100) // irq2status == 1
 			{
 				irqStatus &= 0b011; // irq2status = 0
-			}
+			} */
 			irqreturn = PC;
 			PC = irqhandler;
 			Interupted = 1;

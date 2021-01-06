@@ -29,18 +29,12 @@ void getNextIrq2StopCycle()
 	}
 }
 
-char timerIntterupt = 0;
 char irq2Intterupt = 0;
 
 void CycleIncreament()
 {
 	Cycle++;
 
-	if (timerIntterupt)
-	{
-		irqStatus |= 0b001; // irq0status == 1
-		timerIntterupt = 0;
-	}
 	if (irq2Intterupt)
 	{
 		irqStatus |= 0b100; // irq2status == 1
@@ -51,7 +45,7 @@ void CycleIncreament()
 	{
 		if (timercurrent == timermax)
 		{
-			timerIntterupt = 1;
+			irqStatus |= 0b001; // irq0status == 1
 			timercurrent = 0;
 		}
 		else
