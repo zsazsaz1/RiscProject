@@ -32,10 +32,10 @@ exit:
 	lw $s0, $sp, $imm, 0		# restore $s0
 	lw $a1, $sp, $imm, 1		# restore $a1
 	lw $a0, $sp, $imm, 2		# restore $a0
-	lw $ra, $sp, $imm, 3        # restore $ra
+	lw $ra, $sp, $imm, 3            # restore $ra
 
-	add $sp, $sp, $imm, 16      # pop 4 items from stack
-	beq $ra, $zero, $zero, 0	# return
+	add $sp, $sp, $imm, 4          # pop 4 items from stack
+	beq $ra, $zero, $zero, 0       # return
 	
 	.word 0x100 5               # arbitrary numbers for the binom func
 	.word 0x101 2
