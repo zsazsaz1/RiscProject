@@ -1,10 +1,10 @@
-	add $sp, $zero, $imm, 1
-	sll $sp, $sp, $imm, 11
-	jal $imm, $zero, $zero, bubble         # call bubble (no input arguments) :0
-	halt $zero, $zero, $zero, 0	       # halt :2
+	jal $imm, $zero, $zero, bubble         # call bubble (no input arguments) 
+	halt $zero, $zero, $zero, 0	       # halt 
 
 bubble:
-	add $sp, $sp, $imm, -2                 # adjust stack for 2 items :3 
+	add $sp, $zero, $imm, 1                # set $sp = 1
+	sll $sp, $sp, $imm, 11	               # set $sp = 1 << 11 = 2048
+	add $sp, $sp, $imm, -2                 # adjust stack for 2 items 
 	sw $s0, $sp, $imm, 1                   # save $s0
 	sw $s1, $sp, $imm, 0                   # save $s1
 
@@ -12,20 +12,20 @@ bubble:
 	add $t0, $zero, $imm, 16               # $t0 = N = 16 (length of the array)
 
 LOOP1: 
-	add $s0, $s0, $imm, 1                  # i++ (strat from 0)
-	bge $s0, $t0, $imm, end                # if (i>=N) end this loop 
+	add $s0, $s0, $imm, 1                  # i++ (start from 0)
+	bge $imm, $s0, $t0, end                # if (i>=N) end this loop 
 	add $s1, $zero, $zero, 0               # $s1 = j = 0
 
 LOOP2:
 	sub $t1, $t0, $s0, 0                   # $t1 = N-i
-	add $t1, $t1, $imm, -1		             # $t1 = N-i-1
-	bge $s1, $t1, $imm, LOOP1              # if (j>=N-i-1) end this loop 
+	add $t1, $t1, $imm, -1		       # $t1 = N-i-1
+	bge $imm, $s1, $t1, LOOP1              # if (j>=N-i-1) end this loop 
 
 	lw $t1, $s1, $imm, 1024                # $t1 = arr[j]
 	add $s1, $s1, $imm ,1                  # j = j+1
 	lw $t2, $s1, $imm, 1024                # $t2 = arr[j+1]
 
-	blt $t1, $t2, $imm, swap               # if(arr[j]<arr[j+1]) swap
+	blt $imm, $t1, $t2, swap               # if(arr[j]<arr[j+1]) swap
 	beq $imm, $zero, $zero, LOOP2          # continue the loop
 
 swap:
@@ -36,10 +36,10 @@ swap:
 	beq $imm, $zero, $zero, LOOP2          # continue the loop  
 
 end:
-	lw $s1, $sp, $imm, 0		        # restore $s1
-	lw $s0, $sp, $imm, 1	                # restore $s0
-	add $sp, $sp, $imm, 2		        # pop 2 items from stack
-	beq $ra, $zero, $zero, 0	        # return
+	lw $s1, $sp, $imm, 0		       # restore $s1
+	lw $s0, $sp, $imm, 1	               # restore $s0
+	add $sp, $sp, $imm, 2		       # pop 2 items from stack
+	beq $ra, $zero, $zero, 0	       # return
 
 .word 1024 1
 .word 1025 2
