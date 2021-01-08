@@ -1,10 +1,10 @@
 	add $t0, $zero, $imm, 6		# set $t0 = 6
-	out $imm, $t0, $zero, LedInterrupt	# set irqhandler as L1
+	out $imm, $t0, $zero, LedInterrupt	# set irqhandler as LedInterrupt
 	out $imm, $zero, $zero, 1 	# enable irq0
 	add $t0, $zero, $imm, 13	# set $t0 = 13
 	out $imm, $t0, $zero, 1023 	# set timermax = 1023 (because it includes zero)
 	add $t0, $zero, $imm, 11	# set $t0 = 12
-	add $s0, $zero, $imm, Nop	# set $s0 = Nop, makes cycles more reliable not using $imm
+	add $s0, $zero, $imm, Nop	# set $s0 = Nop, makes cycles more reliable not using $imm (seeing 1024 clear cycles between each Interrupt on trace file)
 	out $imm, $t0, $zero, 1 	# set timerenable = 1024
 	jal $imm, $zero, $zero, Nop # jump to Nop and save next addres in $ra
 	halt $zero, $zero, $zero, 0	# halt
