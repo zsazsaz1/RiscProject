@@ -5,7 +5,7 @@
 #define MONITOR_Y 288
 
 #define DISK_IO_CYCLES 1024
-#define SECTOR_SIZE 512
+#define SECTOR_SIZE (512 / 4)
 
 extern char irqEnable;
 extern char irqStatus;

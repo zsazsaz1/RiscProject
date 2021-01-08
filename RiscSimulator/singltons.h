@@ -4,7 +4,7 @@
 #define REGISTER_COUNT 16
 #define INSTRUCTION_RAM_SIZE 1024
 #define RAM_SIZE 4096
-#define DISK_SIZE (64*(1<<10))
+#define DISK_SIZE ((64*(1<<10)) / 4)
 
 #define IMM 1
 #define RA 15
