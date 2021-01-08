@@ -55,6 +55,7 @@ Loop:
 	sw $v0, $s0, $s1, 0			# Ram[$s0+$s1] = $v0
 	add $s0, $zero, $zero, 0	# resets $s0 = 0
 	add $s1, $s1, $imm, 1		# set $s1 += 1 
+	add $v0, $zero, $zero, 0	# set $v0 = 0
 	add $t0, $zero, $imm, 128	# set $t0 = 128
 	blt $imm, $s1, $t0, Loop	# if $s1 < 128 jump back to Loop
 
