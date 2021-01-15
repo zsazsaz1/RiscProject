@@ -11,7 +11,7 @@ void getImmediate()
 	int isImmSigned = (InstructionRam[PC] & 0x80000) >> 19;
 	if (isImmSigned)
 	{
-		Registers[IMM] = -((InstructionRam[PC] ^ 0xFFFFF) + 1);
+		Registers[IMM] = -((InstructionRam[PC] ^ 0xFFFFF) + 1); // the inverse plus one
 	}
 	else
 	{
@@ -204,7 +204,7 @@ void jal (int rd, int rs, int rt)
 		getImmediate();
 	}
 	Registers[RA] = PC + 1;
-	jumpToReg(rd); // maybe need to check if rd is reg 15
+	jumpToReg(rd); // maybe need to check if rd is reg 15, but we assume the programmer knows what he's doing
 	
 }
 
@@ -224,7 +224,7 @@ void sw (int rd, int rs, int rt)
 
 void reti (int rd, int rs, int rt)
 {
-	PC = irqreturn & 0x3FF;
+	PC = irqreturn & 0x3FF; //10 bits
 	Interupted = 0;
 	CycleIncreament();
 }

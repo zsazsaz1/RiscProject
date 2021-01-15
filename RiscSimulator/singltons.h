@@ -4,7 +4,7 @@
 #define REGISTER_COUNT 16
 #define INSTRUCTION_RAM_SIZE 1024
 #define RAM_SIZE 4096
-#define DISK_SIZE ((64*(1<<10)) / 4)
+#define DISK_SIZE ((64*(1<<10)) / 4) // we defined Disk array to be 32 bits (a word) in each index, which is 4 bytes, so we devided by 4 to have 64 K bytes at the end
 
 #define IMM 1
 #define RA 15

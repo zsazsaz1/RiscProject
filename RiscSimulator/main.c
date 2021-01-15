@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 	monitorInitializer();
 
 	traceFile = fopen(argv[TRACE], "w");
-	asssertFileOpen(traceFile, argv[TRACE]);
+	asssertFileOpen(traceFile, argv[TRACE]);  
 
 	irq2in = fopen(argv[IRQ2IN], "r");
 	asssertFileOpen(irq2in, argv[IRQ2IN]);
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 		if (irqEnable & irqStatus && !Interupted)
 		{
 			/*
-			we understood from the fib example, that it is the assembly responsability to reset irq2
+			we understood from the fib example, that it is the assembly responsability to reset irq2.
 			if (irqStatus & 0b100) // irq2status == 1
 			{
 				irqStatus &= 0b011; // irq2status = 0
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 		int8_t rs = (currentInstruction & 0xF0) >> 4;
 		int8_t rt = (currentInstruction & 0xF);
 		OpcodeMap[currentOpCode](rd, rs, rt);
-		RegistersCopy[1] = Registers[1];
+		RegistersCopy[1] = Registers[1]; //we used it, so in case of imm, we'd have the PC at the start of the action but have the imm that should be printed
 		writeTraceToFile(lastPC, RegistersCopy, currentInstruction);
 
 		numofAssemblyOperations++;

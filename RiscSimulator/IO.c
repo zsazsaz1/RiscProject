@@ -10,8 +10,8 @@ uint8_t Monitor[MONITOR_X][MONITOR_Y];
 
 char irqEnable = 0; // first bit is irq0, second 1, and third 2.
 char irqStatus = 0; // first bit is irq0, second 1, and third 2.
-int16_t irqhandler = 0; // TD 10 bits
-int16_t irqreturn = 0; // TD 10 bits
+int16_t irqhandler = 0; // 10 bits
+int16_t irqreturn = 0; // 10 bits
 uint32_t leds = 0;
 int32_t reserved = 0;
 char timerenable = 0; // 1 bit
@@ -122,7 +122,7 @@ int32_t getIORegister(int8_t IORegisterNum)
 		retValue = diskstatus & 0b1;
 		break;
 	case 18:
-		retValue = 0; //monitorcmd & 0b1 
+		retValue = 0; //calling for monitorcmd always return 0 
 		break;
 	case 19:
 		retValue = monitorx & 0x1FF;
@@ -191,7 +191,7 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 		timermax = value;
 		break;
 	case 14:
-		if (0 == diskcmd) // in order to prevent the assembler access to the disk while it's in the middle of a previous task
+		if (0 == diskcmd) // in order to prevent the assembly access to the disk while it's in the middle of a previous task
 		{
 			diskcmd = value & 0b11;
 			if ((1 == diskcmd) | (2 == diskcmd))
@@ -212,7 +212,7 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 		break;
 	case 18:
 		monitorcmd = value & 0b1;
-		writePixel(); //-----
+		writePixel(); //-
 		break;
 	case 19:
 		monitorx = value & 0x1FF;
@@ -328,7 +328,7 @@ void readFromDisk()
 	int16_t diskSectorPointer = disksector * SECTOR_SIZE;
 	for (int16_t i = 0; i < SECTOR_SIZE; i++)
 	{
-		Ram[diskbuffer + i] = Disk[diskSectorPointer + i];
+		Ram[diskbuffer + i] = Disk[diskSectorPointer + i]; // in a growing order
 	}
 }
 
@@ -337,6 +337,6 @@ void writeToDisk()
 	int16_t diskSectorPointer = disksector * SECTOR_SIZE;
 	for (int16_t i = 0; i < SECTOR_SIZE; i++)
 	{
-		Disk[diskSectorPointer + i] = Ram[diskbuffer + i];
+		Disk[diskSectorPointer + i] = Ram[diskbuffer + i]; // in a growing order
 	}
 }
