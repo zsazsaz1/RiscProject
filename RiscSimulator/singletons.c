@@ -19,6 +19,9 @@ unsigned int irq2stopCycles;
 char resetIrq2Status = 0;
 FILE* irq2in;
 
+/*
+Used in order to scan irq2.txt and get the next irq2 interruption cycle, it rewinds after it gets to the end of the file
+*/
 void getNextIrq2StopCycle()
 {
 	char error = fscanf(irq2in, "%d", &irq2stopCycles);
@@ -31,6 +34,11 @@ void getNextIrq2StopCycle()
 
 char irq2Intterupt = 0;
 
+/*
+The function is being called after every operation and getting an Immediate.
+It increases the cycles by one.
+The function also handles the Interruptions.
+*/
 void CycleIncreament()
 {
 	Cycle++;
@@ -76,6 +84,9 @@ void CycleIncreament()
 	}
 }
 
+/*
+The function is being called every time the PC is being increased by one, and it also increases the cycles by one.
+*/
 void PCAndCycleIncrement()
 {
 	PC++;

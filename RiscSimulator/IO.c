@@ -36,6 +36,17 @@ void writePixel();
 void readFromDisk();
 void writeToDisk();
 
+/*
+input arguments:
+filename[] - the file name we write to.
+cycle - the current cycle.
+ReadorWrite[] - a string, which is going to contain the words "read" or "write" depending on the operation we are doing at the time.
+IORegistersNum - the number of the IO Register that is being read or written to.
+data - the value that is being read from the IO register or written to it.
+
+The function write to the file hwregtrace whenever an IO reister is being read from or written to, it prints the cycle it happened, 
+if it was read or write, the name of the consecutive IO register that is baing called and the data that was read or written to it.
+*/
 void writeHwregtraceToFile(char filename[], int32_t cycle, char ReadorWrite[], int8_t IORegisterNum, int32_t data)
 {
 	char* name = getIORegisterName(IORegisterNum);
@@ -49,6 +60,13 @@ void writeHwregtraceToFile(char filename[], int32_t cycle, char ReadorWrite[], i
 	fclose(file);
 }
 
+/*
+input arguments:
+filename[] - the file name we write to.
+ledsStatus - 32 bits containing the status of the 32 leds, a bit with one says the respective led is on, and a 0 is off.
+
+The function write to the file LedsStatus whenever an the leds IO register is being written, it prints the cycle it happened, and the new status of the leds.
+*/
 void writeLedsStatusTofile(char filename[], int32_t ledsStatus)
 {
 	FILE* file = fopen(filename, "a");
@@ -61,7 +79,16 @@ void writeLedsStatusTofile(char filename[], int32_t ledsStatus)
 	fclose(file);
 }
 
+/*
+input arguments:
+IORegisterNum - the number of the IO register that is being called.
 
+result argument:
+Unless the IO register can't give his original value, the functions returns the value stored in the respective IO register.
+(if the IO register number doesn't exits, the funtion prints an error and returns -1.)
+
+At the end the function uses writeToHwregtrace() with the "READ" string. 
+*/
 int32_t getIORegister(int8_t IORegisterNum)
 {
 	int32_t retValue;
@@ -142,7 +169,16 @@ int32_t getIORegister(int8_t IORegisterNum)
 	return retValue;
 }
 
+/*
+input arguments:
+IORegisterNum - the number of the IO register that is being called.
+value - a value to be written to the respective IO register.
 
+Unless the IO register is read only, the functions writes the value to respective IO register. some IO registers uses their corresponding function if being set.
+(if the IO register number doesn't exits, the funtion prints an error and exits.)
+
+At the end the function uses writeToHwregtrace() with the "WRITE" string.
+*/
 void setIORegister(int8_t IORegisterNum, int32_t value)
 {
 	switch (IORegisterNum)
@@ -231,6 +267,13 @@ void setIORegister(int8_t IORegisterNum, int32_t value)
 	writeHwregtraceToFile(hwregtraceFileName, Cycle, "WRITE", IORegisterNum, value);
 }
 
+/*
+input arguments:
+IORegisterNum - the number of the IO register that is being called.
+
+return argument:
+return a string with the name of the corresponding IO registers.
+*/
 char* getIORegisterName(int8_t IORegisterNum)
 {
 	switch (IORegisterNum)
@@ -287,10 +330,16 @@ char* getIORegisterName(int8_t IORegisterNum)
 
 }
 
+/*
+writes a data to the monitor array of arrays in the pixel In the X position of monitorx, and the Y position of monitory.
+*/
 void writePixel() {
 	Monitor[monitorx][monitory] = monitordata;
 }
 
+/*
+initialize the monitor to all black.
+*/
 void monitorInitializer()
 {
 	for (int16_t i = 0; i < MONITOR_X; i++)
@@ -302,10 +351,17 @@ void monitorInitializer()
 	}
 }
 
+/*
+input arguments:
+monitorFileName - a string with the monitor file name.
+monitorYuvFileName - a string with the monitorYuv file name that will be used with the yuv software.
+
+The fuction is being used at the end of the simulator operation to write the data of the monitor to two files, each in the requested way.
+*/
 void writeMonitorToFile(char monitorFileName[], char monitorYuvFileName[])
 {
 	FILE* monitorFile = fopen(monitorFileName, "w");
-	FILE* monitorYuvFile = fopen(monitorYuvFileName, "wb");
+	FILE* monitorYuvFile = fopen(monitorYuvFileName, "wb"); // writes in binary
 
 	asssertFileOpen(monitorFile, monitorFileName);
 	asssertFileOpen(monitorYuvFile, monitorFileName);
@@ -323,6 +379,9 @@ void writeMonitorToFile(char monitorFileName[], char monitorYuvFileName[])
 	fclose(monitorYuvFile);
 }
 
+/*
+The function is used to read the inserted sector from the disk, and load it onto the Ram.
+*/
 void readFromDisk()
 {
 	int16_t diskSectorPointer = disksector * SECTOR_SIZE;
@@ -332,6 +391,9 @@ void readFromDisk()
 	}
 }
 
+/*
+The function is used to write onto the inserted sector of the disk, the data of from the Ram in the corresponding place.
+*/
 void writeToDisk()
 {
 	int16_t diskSectorPointer = disksector * SECTOR_SIZE;
